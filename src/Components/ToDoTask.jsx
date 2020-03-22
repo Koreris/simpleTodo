@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
@@ -18,8 +18,6 @@ const useStyles = makeStyles(theme => ({
 
 export default function ToDoTask({ toggleCheck, myTask, index }) {
   const classes = useStyles();
-  const [isChecked, setIsChecked] = useState(myTask.checked);
-
   return (
     <div>
       <ListItem
@@ -28,7 +26,6 @@ export default function ToDoTask({ toggleCheck, myTask, index }) {
         dense
         button
         onClick={() => {
-          setIsChecked(!isChecked);
           toggleCheck(index);
         }}
       >
@@ -38,13 +35,13 @@ export default function ToDoTask({ toggleCheck, myTask, index }) {
             icon={<Unchecked />}
             checkedIcon={<Checked />}
             color="default"
-            checked={isChecked}
+            checked={myTask.checked}
             tabIndex={-1}
             disableRipple
           />
         </ListItemIcon>
         <ListItemText
-          className={isChecked ? classes.strikethrough : ""}
+          className={myTask.checked ? classes.strikethrough : ""}
           primary={myTask.value}
         />
       </ListItem>

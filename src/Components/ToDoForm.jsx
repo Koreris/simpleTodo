@@ -6,23 +6,23 @@ const useStyles = makeStyles(theme => ({
   form: {
     width: "100%",
     paddingLeft: "2rem"
-  },
+  }
 }));
 
-
 const ToDoForm = ({ addTask }) => {
-  const classes = useStyles()
+  const classes = useStyles();
   const [value, setValue] = useState("");
   return (
     <form
       className={classes.form}
-      onSubmit={(event) => {
-        event.preventDefault()
+      onSubmit={event => {
+        event.preventDefault();
         addTask({ value: value, checked: false });
       }}
     >
       <TextField
         color="secondary"
+        required
         variant="standard"
         placeholder="What needs to be done?"
         margin="none"

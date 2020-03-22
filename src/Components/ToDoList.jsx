@@ -8,10 +8,8 @@ import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
 import ToDoForm from "./ToDoForm";
 import ToDoTask from "./ToDoTask";
-import { FormHelperText } from "@material-ui/core";
 
 const IconLeftExpansionPanelSummary = withStyles({
   expandIcon: {
@@ -55,39 +53,27 @@ function ToDoList() {
   const classes = useStyles();
 
   const [myTodoList, setTodoList] = useState([]);
-  const [toDisplayList, setDisplayList] = useState(myTodoList);
   const [myTodoCount, setTodoCount] = useState([myTodoList.length]);
 
   const toggleCheck = index => {
-    const tempList = [...myTodoList];
-    tempList[index].checked = !tempList[index].checked;
-    setTodoList(tempList);
-    const tempCount = tempList.filter((x,i) => { return !x.checked; }).length;
-    setTodoCount(tempCount);
+    setTodoList((currentList)=>{ 
+      const tempList = [...currentList];
+      tempList[index].checked = !tempList[index].checked;
+      const tempCount = tempList.filter((x) => {
+        return !x.checked;
+      }).length;
+      setTodoCount(tempCount);
+      return tempList 
+    });
+
+
   };
 
   const addTask = task => {
-    const tempList = [...myTodoList, task];
-    setTodoList(tempList);
-    setDisplayList(tempList);
-    const tempCount = parseInt(myTodoCount)+1;
-    setTodoCount(tempCount);
+    setTodoList((currentList)=>[...currentList, task]);
+    setTodoCount((myTodoCount)=>parseInt(myTodoCount)+1);
   };
   const [filter, setFilter] = useState(FILTERS.all);
-
-  const toggleFilters = filter => {
-    switch (filter) {
-      case FILTERS.all:
-        setDisplayList(myTodoList);
-        break;
-      case FILTERS.active:
-        setDisplayList(myTodoList.filter(item => !item.checked));
-        break;
-      case FILTERS.completed:
-        setDisplayList(myTodoList.filter(item => item.checked));
-        break;
-    }
-  };
 
   return (
     <div className={classes.root}>
@@ -103,27 +89,38 @@ function ToDoList() {
         </div>
         <ExpansionPanelDetails>
           <List className={classes.list}>
-            {toDisplayList.map((myTask, index) => {
-              return (
-                <ToDoTask
-                  toggleCheck={toggleCheck}
-                  myTask={myTask}
-                  index={index}
-                ></ToDoTask>
-              );
-            })}
+            {myTodoList
+              .filter((myTask, index) => {
+                myTask.index = index
+                switch (filter) {
+                  case FILTERS.all:
+                    return true;
+                  case FILTERS.active:
+                    return !myTask.checked;
+                  case FILTERS.completed:
+                    return myTask.checked;
+                }
+              })
+              .map((myTask) => {
+                return (
+                  <ToDoTask
+                    toggleCheck={toggleCheck}
+                    myTask={myTask}
+                    index={myTask.index}
+                  ></ToDoTask>
+                );
+              })}
           </List>
         </ExpansionPanelDetails>
         <Grid container>
           <Grid item xs={3} className={classes.cnt}>
-            <div>{(myTodoCount +" items left")}</div>
+            <div>{myTodoCount + " items left"}</div>
           </Grid>
           <Grid item xs className={classes.btnc}>
             <Button
               size="small"
               onClick={() => {
                 setFilter(FILTERS.all);
-                toggleFilters(FILTERS.all);
               }}
               variant={filter === FILTERS.all ? "outlined" : ""}
             >
@@ -133,7 +130,6 @@ function ToDoList() {
               size="small"
               onClick={() => {
                 setFilter(FILTERS.active);
-                toggleFilters(FILTERS.active);
               }}
               variant={filter === FILTERS.active ? "outlined" : ""}
             >
@@ -143,7 +139,6 @@ function ToDoList() {
               size="small"
               onClick={() => {
                 setFilter(FILTERS.completed);
-                toggleFilters(FILTERS.completed);
               }}
               variant={filter === FILTERS.completed ? "outlined" : ""}
             >
